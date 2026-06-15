@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -55,11 +58,11 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v3
+        uses: actions/deploy-pages@v4
 
       - name: Create deployment summary
         if: always()
         run: |
           echo "## 🎉 Emoji Gallery Deployed!" >> $GITHUB_STEP_SUMMARY
-          EMOJI_COUNT=$(grep -c '|' emojis.txt 2>/dev/null || echo "unknown")
-          echo "**Total emojis:** $EMOJI_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Your gallery is now live at the GitHub Pages URL above." >> $GITHUB_STEP_SUMMARY
