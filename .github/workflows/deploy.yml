@@ -1,5 +1,4 @@
 name: Deploy Emoji Gallery
-
 on:
   push:
     branches:
@@ -13,22 +12,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pages: write
       id-token: write
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Validate emojis.txt format
         run: |
@@ -37,8 +29,7 @@ jobs:
             echo "emojis.txt not found!"
             exit 1
           fi
-          
-          # Check that each line has pipe separator
+
           while IFS= read -r line || [ -n "$line" ]; do
             if [ -z "$line" ]; then
               continue
@@ -48,7 +39,7 @@ jobs:
               exit 1
             fi
           done < emojis.txt
-          
+
           echo "✓ emojis.txt validation passed"
 
       - name: Ensure index.html exists
@@ -59,19 +50,26 @@ jobs:
           fi
           echo "✓ index.html found"
 
+      - name: Build site folder
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp emojis.txt _site/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
 
       - name: Create deployment summary
+        if: always()
         run: |
           echo "## 🎉 Emoji Gallery Deployed!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
