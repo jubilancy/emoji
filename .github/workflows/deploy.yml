@@ -1,0 +1,85 @@
+name: Deploy Emoji Gallery
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'emojis.txt'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate emojis.txt format
+        run: |
+          echo "Validating emojis.txt..."
+          if [ ! -f emojis.txt ]; then
+            echo "emojis.txt not found!"
+            exit 1
+          fi
+          
+          # Check that each line has pipe separator
+          while IFS= read -r line || [ -n "$line" ]; do
+            if [ -z "$line" ]; then
+              continue
+            fi
+            if [[ ! "$line" =~ \| ]]; then
+              echo "Invalid line format (missing |): $line"
+              exit 1
+            fi
+          done < emojis.txt
+          
+          echo "✓ emojis.txt validation passed"
+
+      - name: Ensure index.html exists
+        run: |
+          if [ ! -f index.html ]; then
+            echo "index.html not found in repository!"
+            exit 1
+          fi
+          echo "✓ index.html found"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🎉 Emoji Gallery Deployed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Files included:**" >> $GITHUB_STEP_SUMMARY
+          echo "- 📄 index.html" >> $GITHUB_STEP_SUMMARY
+          echo "- 📋 emojis.txt" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          EMOJI_COUNT=$(grep -c '|' emojis.txt || echo "0")
+          echo "**Total emojis:** $EMOJI_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Your gallery is now live! Check the GitHub Pages URL above." >> $GITHUB_STEP_SUMMARY
