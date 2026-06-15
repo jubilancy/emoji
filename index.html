@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --accent-light: #ff6b7a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --border: #2d2d4a;
+            --success: #00d4aa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            animation: float 15s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, 30px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease-out 0.1s both;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border);
+            background: var(--secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn.primary {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .search-box {
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            position: relative;
+            animation: slideDown 0.6s ease-out 0.2s both;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border);
+            background: var(--secondary);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            animation: slideUp 0.6s ease-out 0.3s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .emoji-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--secondary) 0%, rgba(45, 45, 74, 0.5) 100%);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            padding: 1rem;
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .emoji-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(233, 69, 96, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .emoji-card:hover::before {
+            opacity: 1;
+        }
+
+        .emoji-image {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .emoji-card:hover .emoji-image {
+            transform: scale(1.1);
+        }
+
+        .emoji-name {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            word-break: break-all;
+            transition: color 0.4s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .emoji-card:hover .emoji-name {
+            color: var(--text-primary);
+        }
+
+        .emoji-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4), 0 0 40px rgba(233, 69, 96, 0.1);
+            transform: translateY(-8px);
+        }
+
+        /* Enlarged hover preview */
+        .emoji-preview {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--secondary);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 2rem;
+            min-width: 200px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .emoji-preview.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .emoji-preview img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+
+        .emoji-preview-name {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            word-break: break-all;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-direction: column;
+        }
+
+        .preview-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--accent);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .preview-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .checkbox-input {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .emoji-card.selected {
+            border-color: var(--success);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        .stats {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .stats span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--secondary);
+            border: 2px solid var(--success);
+            color: var(--success);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 1001;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .emoji-preview {
+                bottom: 1rem;
+                right: 1rem;
+                min-width: 160px;
+                padding: 1.5rem 1rem;
+            }
+
+            .emoji-preview img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✨ Emoji Gallery</h1>
+            <p class="subtitle">Hover to preview • Click to copy • Select to download</p>
+        </header>
+
+        <div class="controls">
+            <button class="btn primary" onclick="selectAll()">Select All</button>
+            <button class="btn" onclick="deselectAll()">Deselect All</button>
+            <button class="btn primary" id="downloadBtn" onclick="downloadSelected()" disabled>Download Selected</button>
+        </div>
+
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search emojis..."
+                onkeyup="filterGallery()"
+            >
+        </div>
+
+        <div class="gallery" id="gallery"></div>
+
+        <div class="stats">
+            Total: <span id="totalCount">0</span> • Visible: <span id="visibleCount">0</span> • Selected: <span id="selectedCount">0</span>
+        </div>
+    </div>
+
+    <div class="emoji-preview" id="emojiPreview">
+        <img id="previewImage" src="" alt="">
+        <div class="emoji-preview-name" id="previewName"></div>
+        <div class="preview-actions">
+            <button class="preview-btn" onclick="copyToClipboard()">📋 Copy URL</button>
+            <button class="preview-btn" onclick="copyName()">📝 Copy Name</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let emojis = [];
+        let currentPreview = null;
+        let selectedEmojis = new Set();
+
+        // Fetch and parse emojis.txt
+        async function loadEmojis() {
+            try {
+                const response = await fetch('emojis.txt');
+                const text = await response.text();
+                
+                emojis = text
+                    .split('\n')
+                    .map(line => {
+                        const [name, url] = line.trim().split('|');
+                        return name && url ? { name: name.trim(), url: url.trim() } : null;
+                    })
+                    .filter(e => e !== null);
+
+                renderGallery();
+            } catch (error) {
+                console.error('Error loading emojis:', error);
+                showToast('Error loading emoji data', 'error');
+            }
+        }
+
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = emojis.filter(e => 
+                e.name.toLowerCase().includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                gallery.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">No emojis found</div>';
+                document.getElementById('visibleCount').textContent = '0';
+                return;
+            }
+
+            gallery.innerHTML = filtered.map((emoji, index) => `
+                <div class="emoji-card ${selectedEmojis.has(emoji.name) ? 'selected' : ''}" 
+                     onmouseenter="showPreview('${emoji.name.replace(/'/g, "\\'")}', '${emoji.url.replace(/'/g, "\\'")}', event)"
+                     onmouseleave="hidePreview()"
+                     onclick="toggleSelect(event, '${emoji.name.replace(/'/g, "\\'")}')"
+                     ondblclick="copyToClipboard(event, '${emoji.url.replace(/'/g, "\\'")}')"
+                >
+                    <input type="checkbox" class="checkbox-input" 
+                           ${selectedEmojis.has(emoji.name) ? 'checked' : ''}
+                           onclick="event.stopPropagation()"
+                    >
+                    <img src="${emoji.url}" alt="${emoji.name}" class="emoji-image" onerror="this.style.opacity='0.3'">
+                    <div class="emoji-name">${emoji.name}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('totalCount').textContent = emojis.length;
+            document.getElementById('visibleCount').textContent = filtered.length;
+        }
+
+        function filterGallery() {
+            renderGallery();
+        }
+
+        function showPreview(name, url, event) {
+            currentPreview = { name, url };
+            const preview = document.getElementById('emojiPreview');
+            document.getElementById('previewImage').src = url;
+            document.getElementById('previewName').textContent = name;
+            preview.classList.add('active');
+        }
+
+        function hidePreview() {
+            document.getElementById('emojiPreview').classList.remove('active');
+        }
+
+        function toggleSelect(event, name) {
+            if (event.target.classList.contains('checkbox-input')) return;
+            
+            if (selectedEmojis.has(name)) {
+                selectedEmojis.delete(name);
+            } else {
+                selectedEmojis.add(name);
+            }
+            
+            renderGallery();
+            updateDownloadBtn();
+        }
+
+        function selectAll() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            emojis
+                .filter(e => e.name.toLowerCase().includes(searchTerm))
+                .forEach(e => selectedEmojis.add(e.name));
+            renderGallery();
+            updateDownloadBtn();
+        }
+
+        function deselectAll() {
+            selectedEmojis.clear();
+            renderGallery();
+            updateDownloadBtn();
+        }
+
+        function updateDownloadBtn() {
+            const btn = document.getElementById('downloadBtn');
+            btn.disabled = selectedEmojis.size === 0;
+            document.getElementById('selectedCount').textContent = selectedEmojis.size;
+        }
+
+        function copyToClipboard(event, url) {
+            const urlToCopy = url || (currentPreview ? currentPreview.url : null);
+            if (!urlToCopy) return;
+
+            navigator.clipboard.writeText(urlToCopy).then(() => {
+                showToast('URL copied to clipboard!');
+            }).catch(() => {
+                showToast('Failed to copy', 'error');
+            });
+        }
+
+        function copyName() {
+            if (currentPreview) {
+                navigator.clipboard.writeText(currentPreview.name).then(() => {
+                    showToast('Name copied to clipboard!');
+                }).catch(() => {
+                    showToast('Failed to copy', 'error');
+                });
+            }
+        }
+
+        async function downloadSelected() {
+            if (selectedEmojis.size === 0) return;
+
+            try {
+                const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
+                const zip = new JSZip();
+
+                let downloaded = 0;
+
+                for (const name of selectedEmojis) {
+                    const emoji = emojis.find(e => e.name === name);
+                    if (!emoji) continue;
+
+                    try {
+                        const response = await fetch(emoji.url);
+                        const blob = await response.blob();
+                        
+                        // Extract extension from URL or use .gif as default
+                        const ext = emoji.url.split('.').pop().split('?')[0] || 'gif';
+                        zip.file(`${emoji.name}.${ext}`, blob);
+                        downloaded++;
+                    } catch (e) {
+                        console.error(`Failed to download ${emoji.name}:`, e);
+                    }
+                }
+
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `emojis-${Date.now()}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showToast(`Downloaded ${downloaded} emoji${downloaded !== 1 ? 's' : ''}`);
+                deselectAll();
+            } catch (error) {
+                console.error('Download error:', error);
+                showToast('Error downloading files', 'error');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.borderColor = type === 'error' ? '#ff6b7a' : 'var(--success)';
+            toast.style.color = type === 'error' ? '#ff6b7a' : 'var(--success)';
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Load emojis on page load
+        loadEmojis();
+    </script>
+</body>
+</html>
