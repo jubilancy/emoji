@@ -8,3 +8,4 @@
 :sparkles_blue:|https://cdn.discordapp.com/emojis/926218949992001596.gif
 :TP_Color_PurpledShine:|https://cdn.discordapp.com/emojis/833656380329164830.webp
 :yellow_sparkles_moon:|https://cdn.discordapp.com/emojis/959852041029705779.gif
+:svg-test:|https://raw.githubusercontent.com/googlefonts/noto-emoji/8998f5dd683424a73e2314a8c1f1e359c19e8742/svg/emoji_u1f3a0.svg
