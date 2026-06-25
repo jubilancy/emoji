@@ -1541,7 +1541,6 @@
 :sysdig:|https://www.vectorlogo.zone/logos/sysdig/sysdig-icon.svg
 :tablerio:|https://www.vectorlogo.zone/logos/tablerio/tablerio-icon.svg
 :tabulatorinfo:|https://www.vectorlogo.zone/logos/tabulatorinfo/tabulatorinfo-icon.svg
-https://www.vectorlogo.zone/logos/tags.html
 :tailwindcss:|https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg
 :talend:|https://www.vectorlogo.zone/logos/talend/talend-icon.svg
 :tandemcouk:|https://www.vectorlogo.zone/logos/tandemcouk/tandemcouk-icon.svg
