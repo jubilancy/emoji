@@ -925,7 +925,6 @@
 :imgur:|https://www.vectorlogo.zone/logos/imgur/imgur-icon.svg
 :inc:|https://www.vectorlogo.zone/logos/inc/inc-icon.svg
 :includeos:|https://www.vectorlogo.zone/logos/includeos/includeos-icon.svg
-https://www.vectorlogo.zone/logos/index.html
 :infernojs:|https://www.vectorlogo.zone/logos/infernojs/infernojs-icon.svg
 :influxdata:|https://www.vectorlogo.zone/logos/influxdata/influxdata-icon.svg
 :infoblox:|https://www.vectorlogo.zone/logos/infoblox/infoblox-icon.svg
